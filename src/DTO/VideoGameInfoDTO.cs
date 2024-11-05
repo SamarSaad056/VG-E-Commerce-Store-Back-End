@@ -79,6 +79,7 @@ namespace FusionTech.src.DTO
             public ICollection<VideoGameVersionSimpleReadDto> VideoGameVersions { get; set; }
             public ICollection<StudioReadDTO> GameStudios { get; set; }
             public ICollection<CategoryBasicDto> Categories { get; set; }
+            public ICollection<GameConsole> Consoles { get; set; }
         }
 
         public class VideoGameWithVersionDto
