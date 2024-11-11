@@ -48,12 +48,18 @@ namespace FusionTech.src.Repository
         // Create a new video game
         public async Task<VideoGameInfo> CreateOneAsync(VideoGameInfo newGameInfo)
         {
+            foreach (var category in newGameInfo.Categories)
+                _databaseContext.Attach(category);
+
+            foreach (var studio in newGameInfo.GameStudios)
+                _databaseContext.Attach(studio);
+
             await _videoGameInfos.AddAsync(newGameInfo);
             await _databaseContext.SaveChangesAsync();
             return newGameInfo;
         }
 
-        // Get all video games
+        //Get all video games
         public async Task<List<VideoGameInfo>> GetAllAsync()
         {
             return await _videoGameInfos.ToListAsync();
@@ -85,6 +91,11 @@ namespace FusionTech.src.Repository
         public async Task<List<VideoGameInfo>> GetAllWithVersionAsync()
         {
             return await _videoGameInfos.Include(v => v.VideoGameVersions).ToListAsync();
+        }
+
+        public async Task<int> CountAsync()
+        {
+            return await _videoGameInfos.CountAsync();
         }
     }
 }

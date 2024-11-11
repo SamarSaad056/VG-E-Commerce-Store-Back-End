@@ -24,52 +24,80 @@ namespace FusionTech.src.Repository
         }
 
         public async Task<List<Category>> GetAllDetailedAsync(SearchParameters searchParameters)
-        {
-            IQueryable<Category> query = _category
-                .Include(c => c.VideoGameInfos)
-                .ThenInclude(vi => vi.VideoGameVersions);
+       {
+           IQueryable<Category> query = _category
+               .Include(c => c.VideoGameInfos)
+               .ThenInclude(vi => vi.VideoGameVersions);
 
-            // Search filtering
-            if (!string.IsNullOrEmpty(searchParameters.Search))
-            {
-                query = query.Where(c =>
-                    c.CategoryName.Contains(
-                        searchParameters.Search,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                );
-            }
+           if (!string.IsNullOrEmpty(searchParameters.Search))
+           {
+               var searchTerm = searchParameters.Search.ToLower(); 
 
-            searchParameters.IsValid();
-            if (searchParameters.MinPrice != 0)
-            {
-                query = query.Where(c =>
-                    c.VideoGameInfos.Any(vi =>
-                        vi.VideoGameVersions.Any(v => v.Price >= searchParameters.MinPrice)
-                    )
-                );
-            }
+               query = query.Where(c =>
+                   c.VideoGameInfos.Any(vi =>
+                             vi.GameName.ToLower().Contains(searchTerm) // Convert GameName to lower case for case-insensitive search
+                   )
+               );
+           }
 
-            if (searchParameters.MaxPrice != 10000) // Same as the maximum number written inside SearchParamter class
-            {
-                query = query.Where(c =>
-                    c.VideoGameInfos.Any(vi =>
-                        vi.VideoGameVersions.Any(v => v.Price <= searchParameters.MaxPrice)
-                    )
-                );
-            }
+           // Apply price range filtering
+           if (searchParameters.MinPrice > 0)
+           {
+               query = query.Where(c =>
+                   c.VideoGameInfos.Any(vi =>
+                       vi.VideoGameVersions.Any(v => v.Price >= searchParameters.MinPrice)
+                   )
+               );
+           }
 
-            // Count total categories for pagination
-            int totalCount = await query.CountAsync();
+           if (searchParameters.MaxPrice < 10000) // Assuming 10000 is the default maximum price in your parameter class
+           {
+               query = query.Where(c =>
+                   c.VideoGameInfos.Any(vi =>
+                       vi.VideoGameVersions.Any(v => v.Price <= searchParameters.MaxPrice)
+                   )
+               );
+           }       
 
-            // Pagination
-            var categories = await query
-                .Skip(searchParameters.Offset)
-                .Take(searchParameters.Limit)
-                .ToListAsync();
 
-            return categories;
-        }
+
+           // Apply sorting based on SortBy and Descending parameters
+           switch (searchParameters.SortBy)
+           {
+               case SortingTypes.ByTitle:
+                   query = searchParameters.Descending
+                       ? query.OrderByDescending(c => c.VideoGameInfos.FirstOrDefault().GameName)
+                       : query.OrderBy(c => c.VideoGameInfos.FirstOrDefault().GameName);
+                   break;
+
+               case SortingTypes.ByPrice:
+                   query = searchParameters.Descending
+                       ? query.OrderByDescending(c => c.VideoGameInfos.FirstOrDefault().VideoGameVersions.Min(v => v.Price))
+                       : query.OrderBy(c => c.VideoGameInfos.FirstOrDefault().VideoGameVersions.Min(v => v.Price));
+                   break;
+
+               case SortingTypes.ByRating:
+                   query = searchParameters.Descending
+                       ? query.OrderByDescending(c => c.VideoGameInfos.FirstOrDefault().TotalRating)
+                       : query.OrderBy(c => c.VideoGameInfos.FirstOrDefault().TotalRating);
+                   break;
+
+               case SortingTypes.None:
+               default:
+            
+                   query = query.OrderBy(c => c.CategoryId); 
+                   break;
+           }
+
+           // Apply pagination (
+           var categories = await query
+               .Skip(searchParameters.Offset)
+               .Take(searchParameters.Limit)
+               .ToListAsync();
+
+
+           return categories;
+       }
 
         public async Task<int> CountAsync()
         {
@@ -127,3 +155,5 @@ namespace FusionTech.src.Repository
         }
     }
 }
+
+      

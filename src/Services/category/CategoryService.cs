@@ -17,42 +17,24 @@ namespace FusionTech.src.Services.category
             var categoryCreated = await _categoryRepository.CreateOneAsync(category);
             return _mapper.Map<CategoryBasicDto>(categoryCreated);
         }
-
         public async Task<List<CategoryBasicDto>> GetAllAsync(PaginationOptions paginationOptions)
-        {
-            var categories = await _categoryRepository.GetAllAsync();
-            if (!string.IsNullOrEmpty(paginationOptions.Search))
-                categories = categories
-                    .Where(c =>
-                        c.CategoryName.Contains(
-                            paginationOptions.Search,
-                            StringComparison.OrdinalIgnoreCase
-                        )
-                    )
-                    .ToList();
+{
+        var categories = await _categoryRepository.GetAllAsync();
 
-            var pagedCategories = categories
-                .Skip(paginationOptions.Offset)
-                .Take(paginationOptions.Limit)
-                .ToList();
 
-            return _mapper.Map<List<Category>, List<CategoryBasicDto>>(pagedCategories);
-        }
-
+        return _mapper.Map<List<Category>, List<CategoryBasicDto>>(categories);
+    }
+    
         public async Task<(
             List<CategoryFullDetailedDto> Categories,
             int TotalCount
         )> GetAllDetailedAsync(SearchParameters searchParameters)
         {
-            var categories = await _categoryRepository.GetAllDetailedAsync(searchParameters); // Fetch all categories
+            var categories = await _categoryRepository.GetAllDetailedAsync(searchParameters); 
 
-            var totalCount = categories.Count;
-            var pagedCategories = categories
-                .Skip(searchParameters.Offset)
-                .Take(searchParameters.Limit)
-                .ToList();
+            var totalCount = await _categoryRepository.CountAsync();
 
-            var categoryDtos = pagedCategories
+            var categoryDtos = categories
                 .Select(c => new CategoryFullDetailedDto
                 {
                     CategoryId = c.CategoryId,
@@ -60,7 +42,7 @@ namespace FusionTech.src.Services.category
                     VideoGameInfos = c
                         .VideoGameInfos.Select(v => new VideoGameDetailedDto
                         {
-                            VideoGameInfoId = v.VideoGameInfoId,
+                            VideoGameInfoId = v.VideoGameInfoId, 
                             GameName = v.GameName,
                             Description = v.Description,
                             YearOfRelease = v.YearOfRelease,
@@ -147,3 +129,4 @@ namespace FusionTech.src.Services.category
         }
     }
 }
+        

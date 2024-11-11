@@ -19,7 +19,10 @@ namespace FusionTech.src.DTO
             public int TotalRating { get; set; }
             public Guid PublisherId { get; set; }
             public string? GamePicturePath { get; set; }
-            public Guid CategoryId { get; set; }
+            public ICollection<Guid> CategoryIds { get; set; } = [];
+            public ICollection<Guid> GameStudioIds { get; set; } = [];
+            public ICollection<VideoGameVersionCreateWithoutIdDto> VideoGameVersions { get; set; } =
+                [];
         }
 
         public class VideoGameInfoUpdateDto
@@ -60,22 +63,8 @@ namespace FusionTech.src.DTO
             //     new List<VideoGameVersionDTO.VideoGameVersionReadDto>();
         }
 
-        public class VideoGameDetailedDto
+        public class VideoGameDetailedDto : VideoGameInfoReadDto
         {
-            public Guid VideoGameInfoId { get; set; }
-
-            public string? GameName { get; set; }
-
-            public string? Description { get; set; }
-
-            public string? YearOfRelease { get; set; }
-
-            public int TotalRating { get; set; }
-
-            public Guid PublisherId { get; set; }
-
-            public string? GamePicturePath { get; set; }
-
             public ICollection<VideoGameVersionSimpleReadDto> VideoGameVersions { get; set; }
             public ICollection<StudioReadDTO> GameStudios { get; set; }
             public ICollection<CategoryBasicDto> Categories { get; set; }
@@ -99,6 +88,18 @@ namespace FusionTech.src.DTO
             public string? GamePicturePath { get; set; }
 
             public ICollection<VideoGameVersionSimpleReadDto> VideoGameVersions { get; set; }
+        }
+
+        public class VideoGamesInfoListDto
+        {
+            public List<VideoGameInfoReadDto> VideoGamesInfos { get; set; }
+            public int TotalCount { get; set; }
+        }
+
+        public class VideoGamesInfoWithVersionListDto
+        {
+            public List<VideoGameWithVersionDto> VideoGamesInfos { get; set; } = [];
+            public int TotalCount { get; set; }
         }
     }
 }

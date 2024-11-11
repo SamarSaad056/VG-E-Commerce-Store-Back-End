@@ -75,7 +75,7 @@ namespace FusionTech.src.Controllers
 
         [HttpGet]
         [Authorize(Policy = "admin")]
-        public async Task<ActionResult<List<CustomerListDto>>> GetAllUsers(
+        public async Task<ActionResult<CustomerListDto>> GetAllUsers(
             [FromQuery] PaginationOptions paginationOptions
         )
         {

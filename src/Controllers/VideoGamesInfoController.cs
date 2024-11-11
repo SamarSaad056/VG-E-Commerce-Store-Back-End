@@ -13,20 +13,34 @@ namespace FusionTech.src.Controllers
 
         // Get all video games
         [HttpGet]
-        public async Task<ActionResult> GetVideoGames([FromQuery] SearchParameters searchParameters)
+        public async Task<ActionResult<VideoGamesInfoListDto>> GetVideoGames(
+            [FromQuery] SearchParameters searchParameters
+        )
         {
-            var videoGames = await _videoGameInfoService.GetAllAsync(searchParameters);
-            return Ok(videoGames);
+            return Ok(
+                new VideoGamesInfoListDto
+                {
+                    VideoGamesInfos = await _videoGameInfoService.GetAllAsync(searchParameters),
+                    TotalCount = await _videoGameInfoService.CountGamesInfosAsync(),
+                }
+            );
         }
 
         // Get all video games
         [HttpGet("Detailed")]
-        public async Task<ActionResult<VideoGameDetailedDto>> GetVideoGamesWithVersion(
+        public async Task<ActionResult<VideoGamesInfoWithVersionListDto>> GetVideoGamesWithVersion(
             [FromQuery] SearchParameters searchParameters
         )
         {
-            var videoGames = await _videoGameInfoService.GetAllWithVersionAsync(searchParameters);
-            return Ok(videoGames);
+            return Ok(
+                new VideoGamesInfoWithVersionListDto
+                {
+                    VideoGamesInfos = await _videoGameInfoService.GetAllWithVersionAsync(
+                        searchParameters
+                    ),
+                    TotalCount = await _videoGameInfoService.CountGamesInfosAsync(),
+                }
+            );
         }
 
         // Get by ID

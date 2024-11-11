@@ -46,6 +46,5 @@ namespace FusionTech.src.Repository
             await _databaseContext.SaveChangesAsync();
             return true;
         }
-    
     }
 }

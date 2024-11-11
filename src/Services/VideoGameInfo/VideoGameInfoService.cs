@@ -3,6 +3,7 @@ namespace FusionTech.src.Services.VideoGamesInfo
     public class VideoGameInfoService : IVideoGameInfoService
     {
         protected readonly VideoGameInfoRepository _videoGameInfoRepo;
+        protected readonly VideoGameVersionRepository _videoGameVersionRepo;
         protected readonly SystemAdminRepository _systemAdminRepository;
         protected readonly PersonRepository _personRepo;
 
@@ -10,12 +11,14 @@ namespace FusionTech.src.Services.VideoGamesInfo
 
         public VideoGameInfoService(
             VideoGameInfoRepository videoGameInfoRepository,
+            VideoGameVersionRepository videoGameVersionRepository,
             PersonRepository personRepo,
             SystemAdminRepository systemAdminRepository,
             IMapper mapper
         )
         {
             _videoGameInfoRepo = videoGameInfoRepository;
+            _videoGameVersionRepo = videoGameVersionRepository;
             _mapper = mapper;
             _personRepo = personRepo;
             _systemAdminRepository = systemAdminRepository;
@@ -26,29 +29,48 @@ namespace FusionTech.src.Services.VideoGamesInfo
             string email
         )
         {
-            var originalPerson = await _personRepo.FindPersonByEmail(email);
+            var originalPerson =
+                await _personRepo.FindPersonByEmail(email)
+                ?? throw CustomException.NotFound("Person not found.");
+
             var originalSystemAdmin = await _systemAdminRepository.GetByIdAsync(
-                originalPerson!.PersonId
+                originalPerson.PersonId
             );
-            if (originalPerson == null)
-            {
-                throw CustomException.NotFound("Person not found.");
-            }
 
-            if (!(originalSystemAdmin!.ManageGames))
-            {
+            if (!originalSystemAdmin!.ManageGames)
                 throw CustomException.UnAuthorized("Unauthorized access to manage games.");
-            }
 
-            var videoGame = _mapper.Map<VideoGameInfoCreateDto, VideoGameInfo>(createGameInfo);
-            var createdGameInfo = await _videoGameInfoRepo.CreateOneAsync(videoGame);
-
-            if (createdGameInfo == null)
+            var videoGameInfo = new VideoGameInfo
             {
-                throw CustomException.InternalError("Failed to create the video game.");
+                GameName = createGameInfo.GameName,
+                Description = createGameInfo.Description,
+                YearOfRelease = createGameInfo.YearOfRelease,
+                TotalRating = createGameInfo.TotalRating,
+                PublisherId = createGameInfo.PublisherId,
+                GamePicturePath = createGameInfo.GamePicturePath,
+                Categories = createGameInfo
+                    .CategoryIds.Select(id => new Category { CategoryId = id })
+                    .ToList(),
+                GameStudios = createGameInfo
+                    .GameStudioIds.Select(id => new GameStudio { GameStudioId = id })
+                    .ToList(),
+            };
+
+            var createdGameInfo = await _videoGameInfoRepo.CreateOneAsync(videoGameInfo);
+
+            foreach (var versionDto in createGameInfo.VideoGameVersions)
+            {
+                var videoGameVersion = new VideoGameVersion
+                {
+                    VideoGameVersionId = Guid.NewGuid(),
+                    VideoGameInfoId = createdGameInfo.VideoGameInfoId,
+                    GameConsoleId = versionDto.GameConsoleId,
+                    Price = versionDto.Price,
+                };
+                await _videoGameVersionRepo.CreateOneAsync(videoGameVersion);
             }
 
-            return _mapper.Map<VideoGameInfo, VideoGameInfoReadDto>(createdGameInfo);
+            return _mapper.Map<VideoGameInfoReadDto>(createdGameInfo);
         }
 
         public async Task<bool> DeleteAsync(Guid id)
@@ -228,6 +250,11 @@ namespace FusionTech.src.Services.VideoGamesInfo
             }
 
             return await _videoGameInfoRepo.UpdateOnAsync(videoGame);
+        }
+
+        public async Task<int> CountGamesInfosAsync()
+        {
+            return await _videoGameInfoRepo.CountAsync();
         }
     }
 }

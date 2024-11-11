@@ -30,24 +30,30 @@ namespace FusionTech.src.Controllers
             return Ok(categoryList);
         }
 
+    
+
         [HttpGet("Detailed")]
         public async Task<ActionResult<CategoryListDto>> GetAllDetailedAsync(
             [FromQuery] SearchParameters searchParameters
         )
         {
-            // Get paginated category list
-            var (categories, totalCount) = await _categoryService.GetAllDetailedAsync(
-                searchParameters
-            );
+            // Validate search parameters before use
+            searchParameters.IsValid();
 
-            // Map categories to detailed DTOs
+            // Call the service to get categories with game details
+            var (categories, totalCount) = await _categoryService.GetAllDetailedAsync(searchParameters);
+
             var categoriesDto = categories
                 .Select(c => new CategoryFullDetailedDto
                 {
                     CategoryId = c.CategoryId,
                     CategoryName = c.CategoryName,
-                    VideoGameInfos = c
-                        .VideoGameInfos.Select(v => new VideoGameDetailedDto
+                    VideoGameInfos = c.VideoGameInfos
+                        .Where(v =>
+                            string.IsNullOrEmpty(searchParameters.Search) || 
+                            v.GameName.Contains(searchParameters.Search, StringComparison.OrdinalIgnoreCase)
+                        )
+                        .Select(v => new VideoGameDetailedDto
                         {
                             VideoGameInfoId = v.VideoGameInfoId,
                             GameName = v.GameName,
@@ -56,8 +62,8 @@ namespace FusionTech.src.Controllers
                             TotalRating = v.TotalRating,
                             GamePicturePath = v.GamePicturePath,
                             PublisherId = v.PublisherId,
-                            VideoGameVersions = v
-                                .VideoGameVersions.Select(ver => new VideoGameVersionSimpleReadDto
+                            VideoGameVersions = v.VideoGameVersions
+                                .Select(ver => new VideoGameVersionSimpleReadDto
                                 {
                                     VideoGameVersionId = ver.VideoGameVersionId,
                                     Price = ver.Price,
@@ -69,7 +75,7 @@ namespace FusionTech.src.Controllers
                 })
                 .ToList();
 
-            // Create response DTO
+            // Return response with the list of categories and total count
             var response = new CategoryListDto
             {
                 Categories = categoriesDto,
@@ -78,6 +84,7 @@ namespace FusionTech.src.Controllers
 
             return Ok(response);
         }
+
 
         [HttpGet("{CategoryName}")]
         public async Task<ActionResult<List<CategoryDetailedDto>>> GetCategoryDetailsByNameAsync(

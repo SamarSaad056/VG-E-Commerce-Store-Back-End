@@ -26,12 +26,16 @@ namespace FusionTech.src.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Person>().UseTptMappingStrategy();
-            modelBuilder.HasPostgresEnum<PersonType>();
-
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Person>().HasIndex(p => p.PersonEmail).IsUnique();
+
+            modelBuilder.Entity<Person>().HasIndex(p => p.PersonPhoneNumber).IsUnique();
+
             modelBuilder.Entity<Inventory>().HasKey(i => new { i.StoreId, i.VideoGameVersionId });
+
+            modelBuilder.Entity<Person>().UseTptMappingStrategy();
+            modelBuilder.HasPostgresEnum<PersonType>();
 
             // Seed Super Admin
             // this is an extremly sensitive information, it should be removed in a real world scenario.
@@ -1141,7 +1145,7 @@ namespace FusionTech.src.Database
                 PersonEmail = "employeeFatima3@gmail.com",
                 PersonName = "Fatima El-Amin",
                 PersonPassword = hashedPassword3,
-                PersonPhoneNumber = "+966504071005",
+                PersonPhoneNumber = "+966504071006",
                 salt = salt3,
                 Role = "StoreEmployee",
                 Salary = 10000f,
