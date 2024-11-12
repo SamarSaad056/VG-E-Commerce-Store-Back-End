@@ -106,7 +106,7 @@ namespace FusionTech.src.Services.Person
             var foundPerson = await _personRepository.FindPersonByEmail(
                 personSignInDTO.PersonEmail
             );
-
+          
             if (foundPerson == null)
             {
                 throw CustomException.UnAuthorized("Wrong email or password.");
@@ -121,7 +121,12 @@ namespace FusionTech.src.Services.Person
                 throw CustomException.UnAuthorized("Invalid credentials.");
             }
             var tokenUtils = new TokenUtils(_config);
-            return tokenUtils.generateToken(foundPerson);
+           
+          
+            return  tokenUtils.generateToken(foundPerson);
         }
+
+        
     }
+
 }

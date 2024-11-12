@@ -29,6 +29,8 @@ namespace FusionTech.src.DTO
 
             [Required(ErrorMessage = "Person password is required.")]
             public required string PersonPassword { get; set; }
+
+            public PersonType personType{ get; set; }
         }
 
         public class PersonReadDto
