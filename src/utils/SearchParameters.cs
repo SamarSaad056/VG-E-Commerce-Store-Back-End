@@ -2,8 +2,8 @@ namespace FusionTech.src.Utils
 {
     public class SearchParameters : PaginationOptions
     {
-        public float MinPrice { get; set; } = 0.0f;
-        public float MaxPrice { get; set; } = 10000;
+        public float? MinPrice { get; set; } = 0.0f;
+        public float? MaxPrice { get; set; } = 10000;
         public SortingTypes SortBy { get; set; } = SortingTypes.None;
         public bool Descending { get; set; } = false;
 
