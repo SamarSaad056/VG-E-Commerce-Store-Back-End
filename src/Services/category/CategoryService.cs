@@ -17,20 +17,20 @@ namespace FusionTech.src.Services.category
             var categoryCreated = await _categoryRepository.CreateOneAsync(category);
             return _mapper.Map<CategoryBasicDto>(categoryCreated);
         }
+
         public async Task<List<CategoryBasicDto>> GetAllAsync(PaginationOptions paginationOptions)
-{
-        var categories = await _categoryRepository.GetAllAsync();
+        {
+            var categories = await _categoryRepository.GetAllAsync();
 
+            return _mapper.Map<List<Category>, List<CategoryBasicDto>>(categories);
+        }
 
-        return _mapper.Map<List<Category>, List<CategoryBasicDto>>(categories);
-    }
-    
         public async Task<(
             List<CategoryFullDetailedDto> Categories,
             int TotalCount
         )> GetAllDetailedAsync(SearchParameters searchParameters)
         {
-            var categories = await _categoryRepository.GetAllDetailedAsync(searchParameters); 
+            var categories = await _categoryRepository.GetAllDetailedAsync(searchParameters);
 
             var totalCount = await _categoryRepository.CountAsync();
 
@@ -42,7 +42,7 @@ namespace FusionTech.src.Services.category
                     VideoGameInfos = c
                         .VideoGameInfos.Select(v => new VideoGameDetailedDto
                         {
-                            VideoGameInfoId = v.VideoGameInfoId, 
+                            VideoGameInfoId = v.VideoGameInfoId,
                             GameName = v.GameName,
                             Description = v.Description,
                             YearOfRelease = v.YearOfRelease,
@@ -129,4 +129,3 @@ namespace FusionTech.src.Services.category
         }
     }
 }
-        

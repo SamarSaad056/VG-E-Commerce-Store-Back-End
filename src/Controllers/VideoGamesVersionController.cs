@@ -61,6 +61,5 @@ namespace FusionTech.src.Controllers
 
             return NoContent();
         }
-        
     }
 }

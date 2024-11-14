@@ -10,6 +10,7 @@ namespace FusionTech.src.DTO
             public Guid PaymentId { get; set; }
             public Guid StoreId { get; set; }
             public int EmployeeId { get; set; }
+            public int CustomerId { get; set; }
             public List<OrderedGamesReadDto> OrderedGames { get; set; }
         }
 

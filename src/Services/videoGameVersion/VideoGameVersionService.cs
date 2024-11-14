@@ -5,15 +5,22 @@ namespace FusionTech.src.Services.videoGameVersion
         protected readonly VideoGameVersionRepository _videoGameVersionRepo;
         protected readonly IMapper _mapper;
 
-        public VideoGameVersionService(VideoGameVersionRepository videoGameVersionRepository, IMapper mapper)
+        public VideoGameVersionService(
+            VideoGameVersionRepository videoGameVersionRepository,
+            IMapper mapper
+        )
         {
             _videoGameVersionRepo = videoGameVersionRepository;
             _mapper = mapper;
         }
 
-        public async Task<VideoGameVersionReadDto> CreateOneAsync(VideoGameVersionCreateDto createGameVersion)
+        public async Task<VideoGameVersionReadDto> CreateOneAsync(
+            VideoGameVersionCreateDto createGameVersion
+        )
         {
-            var videoGame = _mapper.Map<VideoGameVersionCreateDto, VideoGameVersion>(createGameVersion);
+            var videoGame = _mapper.Map<VideoGameVersionCreateDto, VideoGameVersion>(
+                createGameVersion
+            );
             var createdGameVersion = await _videoGameVersionRepo.CreateOneAsync(videoGame);
             if (createdGameVersion == null)
             {
@@ -41,7 +48,9 @@ namespace FusionTech.src.Services.videoGameVersion
                 throw CustomException.NotFound("No video game versions found.");
             }
 
-            return _mapper.Map<List<VideoGameVersion>, List<VideoGameVersionReadDto>>(videoGameList);
+            return _mapper.Map<List<VideoGameVersion>, List<VideoGameVersionReadDto>>(
+                videoGameList
+            );
         }
 
         public async Task<VideoGameVersionReadDto> GetVersionByIdAsync(Guid id)
@@ -67,8 +76,7 @@ namespace FusionTech.src.Services.videoGameVersion
             {
                 throw CustomException.InternalError("Failed to update the video game version.");
             }
-            return await _videoGameVersionRepo.UpdateOneAsync(foundGameVersion);
+            return isUpdated;
         }
-        
     }
 }

@@ -201,7 +201,11 @@ namespace FusionTech.src.Utils
             CreateMap<VideoGameVersionCreateDto, VideoGameVersion>();
             CreateMap<VideoGameVersionUpdateDto, VideoGameVersion>()
                 .ForAllMembers(opts =>
-                    opts.Condition((src, dest, srcProperty) => srcProperty != null)
+                    opts.Condition(
+                        (src, dest, srcMember) =>
+                            srcMember != null
+                            && (srcMember is not Guid || (Guid)srcMember != Guid.Empty)
+                    )
                 );
         }
     }
