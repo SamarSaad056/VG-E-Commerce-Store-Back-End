@@ -132,7 +132,7 @@ builder.Services.AddCors(options =>
             policy
                 .WithOrigins(
                     "http://localhost:3000",
-                    "https://k-mh21-frontend.onrender.com",
+                    "https://k-mh21-frontend.onrender.com"
                 )
                 .AllowAnyHeader()
                 .AllowAnyMethod()
@@ -140,7 +140,6 @@ builder.Services.AddCors(options =>
         }
     );
 });
-
 
 var app = builder.Build();
 
