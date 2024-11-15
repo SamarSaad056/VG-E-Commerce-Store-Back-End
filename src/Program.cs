@@ -142,11 +142,11 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-
+app.UseCors(MyAllowSpecificOrigins);
 app.UseMiddleware<LoggingMiddleware>();
 app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseStaticFiles();
-app.UseCors(MyAllowSpecificOrigins);
+
 
 app.UseRouting();
 app.MapGet("/", () => "server is running");
