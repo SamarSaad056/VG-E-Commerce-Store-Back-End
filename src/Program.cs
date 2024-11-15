@@ -121,6 +121,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 // Cors
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
@@ -139,15 +140,36 @@ builder.Services.AddCors(options =>
     );
 });
 
+
 var app = builder.Build();
 
+// app.UseCors(MyAllowSpecificOrigins);
 app.UseMiddleware<LoggingMiddleware>();
 app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseStaticFiles();
-app.UseCors(MyAllowSpecificOrigins);
 
 app.UseRouting();
-app.MapGet("/", () => "server is running");
+app.MapGet(
+    "/",
+    async (DatabaseContext dbContext) =>
+    {
+        try
+        {
+            if (await dbContext.Database.CanConnectAsync())
+            {
+                return Results.Ok("Database connection successful.");
+            }
+            else
+            {
+                return Results.Problem("Unable to connect to the database.");
+            }
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem($"Database error: {ex.Message}");
+        }
+    }
+);
 
 //test if the database is conncted
 using (var scope = app.Services.CreateScope())
