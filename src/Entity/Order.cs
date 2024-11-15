@@ -10,8 +10,10 @@ namespace FusionTech.src.Entity
         [ForeignKey("Payment")]
         public Guid PaymentId { get; set; }
         public Guid StoreId { get; set; }
+
         [ForeignKey("StoreEmployee")]
         public int EmployeeId { get; set; }
+
         [ForeignKey("Customer")]
         public int CustomerId { get; set; }
         public ICollection<OrderedGames> OrderedGames { get; set; }

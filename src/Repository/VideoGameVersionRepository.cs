@@ -35,8 +35,7 @@ namespace FusionTech.src.Repository
         public async Task<bool> UpdateOneAsync(VideoGameVersion updateGameVersion)
         {
             _videoGameVersions.Update(updateGameVersion);
-            await _databaseContext.SaveChangesAsync();
-            return true;
+            return await _databaseContext.SaveChangesAsync() > 0;
         }
 
         // Delete a video game

@@ -41,7 +41,7 @@ namespace FusionTech.src.Repository
 
         public async Task<List<Order>> GetAllAsync()
         {
-            return await _order.ToListAsync();
+            return await _order.Include(o => o.OrderedGames).ToListAsync();
         }
 
         public async Task<int> CountAsync()
