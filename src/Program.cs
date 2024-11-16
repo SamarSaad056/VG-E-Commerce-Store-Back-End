@@ -131,7 +131,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-                .WithOrigins("https://vgstore.onrender.com")
+                .WithOrigins("http://http://localhost:3000/ , https://vgstore.onrender.com")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .SetIsOriginAllowed((host) => true)
